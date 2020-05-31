@@ -1,4 +1,5 @@
 import tweepy, sqlite3
+from myTwitterAPI import consumer_key, consumer_secret, access_token, access_token_secret
 
 # Membuat database
 def createDB():
@@ -31,12 +32,6 @@ def insertValue2dB(date, id, text):
                     '''{}''')""").format(date, id, text) # waktu, id status, teks full
     # print(execute)
     c.execute(execute)
-
-# API KEY
-consumer_key = 'vnY9Rur5SOULbPr5HaJ50bekb'
-consumer_secret = 'SOYUsm3x6S6oGUkwBxQV82vCGcIleFlnfdaj62Y5nQ85uOyGYw'
-access_token = '1262806974372012033-BTFcBnQ03ir7kVzzsFs1Cs388gy11y'
-access_token_secret = 'FNTZjQ7kHR0kAlnQH77RqEwarT2tpe1jE45iTGQygYld7'
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
