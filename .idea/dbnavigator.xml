@@ -41,7 +41,9 @@
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="9679acb7-04b7-4e79-9082-926bf629dc41" object-ref="schemas/main/tables/jokowiNewNormal" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="b1587ad0-3703-4213-8dd1-39e8c359c23c" />

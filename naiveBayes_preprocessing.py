@@ -11,11 +11,37 @@ symbolList = ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
 
 # preprocessing kalimat
 def preprocessing(sentence):
+    sentence = sentence.encode('ascii', 'ignore').decode('ascii') # remove all emoji
+    sentence = sentence.replace('  ',' ')       # remove double spasi
+    sentence = sentence.replace('   ', ' ')     # remove triple spasi
+    sentence = sentence.replace('\n', ' ')  # remove enter
+    sentence = sentence.replace("'", ' ')  # remove '
+    # print(sentence)
     new_sentence = []
-    for a_word in sentence.lower().split(' '):   # preprocess untuk memisahkan kata-kata di kalimat
-        # koreksi level 1, menghilangkan @ # dan link
-        if a_word[0] == '@' or a_word[0] == '#' or a_word[0:4]=='http':
+    # print(sentence.lower().split(' '))
+    for a_word in sentence.lower().split(' '):  # preprocess untuk memisahkan kata-kata di kalimat
+        # print(a_word)
+        # hilangkan RT (ReTweet)
+        if a_word=='rt' or a_word=='' or len(a_word)==1:
             continue
+
+        # koreksi level 1, menghilangkan @
+        try:
+            if a_word[0] == '@':
+                continue
+        except:
+            # print('except 1')
+            pass
+
+        # koreksi menghilangkan link
+        try:
+            # print(a_word)
+            if a_word[0:4] == 'http':
+                continue
+        except:
+            # print('except 2')
+            pass
+
         # koreksi level 2, untuk huruf yang <= 3 langsung lolos
         # dan pengecekan simbol untuk atasi 3 huruf yg jadi kehitung 4 krna ada simbol
         if len(a_word) <= 3 or ((a_word[0] in symbolList or a_word[-1] in symbolList) and len(a_word) == 4):
