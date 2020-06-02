@@ -1,98 +1,100 @@
-import sqlite3
-
-def createIdentifiedTable():
-    try:
-        createTable = """
-        CREATE TABLE identifiedData (
-           [primary_key] INTEGER PRIMARY KEY NOT NULL,
-           [originalTweet] TEXT,
-           [preprocessingTweet] TEXT,
-           [type] TEXT
-        );
-        """
-        c.execute(createTable)
-    except:
-        print('pass')
-        pass
-
-def insertFromExistingTable(num):
-    inserted = """
-        INSERT INTO identifiedData(
-            primary_key,
-            originalTweet,
-            preprocessingTweet
-            )
-        Values(
-            {},
-            (select originalTweet from jokowiNewNormal where primary_key={}),
-            (select preprocessResultTweet from jokowiNewNormal where primary_key={})
-            );
-    """.format(num, num, num)
-    c.execute(inserted)
-
-def transfer():
-    c.execute("SELECT originalTweet FROM jokowiNewNormal")
-    selectedColumn = c.fetchall()
-    primary_id = 1
-    for s in selectedColumn:
-        insertFromExistingTable(primary_id)
-        print(primary_id)
-        primary_id+=1
-
-def insertSentimentType(number):
-    if number == '1':
-        sentiment = "mendukung"
-    elif number == '2':
-        sentiment = "meragukan"
-    elif number == '3':
-        sentiment = "menolak"
-    elif number == 'quit' or number == '4' or number == '' or number == ' ':
-        sentiment = "break"
-    else:
-        return print("Masukkan hanya nomor 1 atau 2")
-
-    return sentiment
+import sqlite3, numpy
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 
 dbPATH = 'jokowidanNewNormal.db'   # PATH
 conn = sqlite3.connect(dbPATH)  # konek ke databasenya, kalau belum ada filenya nanti buat sendiri
 c = conn.cursor()   # kursor untuk edit database
-# createIdentifiedTable()
+
 c.execute("""
-    SELECT primary_key FROM identifiedData WHERE type is null or type = ''
+    SELECT preprocessingTweet FROM identifiedData WHERE type = 'mendukung'
     """)
-selected = c.fetchall()
+mendukung = c.fetchall()
+# print(numpy.array(mendukung).shape) # (43, 1)
 
-# semua data di seleksi berdasarkan primary_key nya
-for select in selected:
-    # pertama di tampilkan dulu tweet yang akan di identifikasi
-    print("*********** {} ***********".format(select[0]))
-    print()
+c.execute("""
+    SELECT preprocessingTweet FROM identifiedData WHERE type = 'meragukan'
+    """)
+meragukan = c.fetchall()
+# print(numpy.array(meragukan).shape) # (36, 1)
 
-    command = "SELECT originalTweet FROM identifiedData WHERE primary_key ={}".format(select[0])
-    c.execute(command)
-    selectedTweet = c.fetchall()
-    print(selectedTweet[0][0])
+c.execute("""
+    SELECT preprocessingTweet FROM identifiedData WHERE type = 'menolak'
+    """)
+menolak = c.fetchall()
+# print(numpy.array(menolak).shape) # (50, 1)
 
-    command = "SELECT preprocessingTweet FROM identifiedData WHERE primary_key ={}".format(select[0])
-    c.execute(command)
-    selectedPreprocessingTweet = c.fetchall()
+merged = mendukung[:43] + meragukan[:36] + menolak[:50]
+x_train = []
+for x in range(len(merged)):
+    x_train.append(merged[x][0])
 
-    print()
-    print(" ------ Preprocess ------")
-    print(selectedPreprocessingTweet[0][0])
-    print("")
+y_train = []
 
-    # Tahap memasukkan tipe sentimen ke type secara manual
-    num = input("Tipe sentimen \n 1) Mendukung 2) Meragukan 3) Menolak : ")
-    if insertSentimentType(num) == "break":
-        break
+for i in range(43):
+    y_train.append('mendukung')
+for x in range(36):
+    y_train.append('meragukan')
+for x in range(50):
+    y_train.append('menolak')
 
-    insertType = """
-        UPDATE identifiedData SET type='{}' WHERE primary_key ={}  
-    """.format(insertSentimentType(num), select[0])
-    c.execute(insertType)
-    conn.commit()
-    print(insertSentimentType(num), select[0])
+print(numpy.array(x_train).shape)
+print(numpy.array(y_train).shape)
 
-print("Thanks for your hard work")
+count_vect = CountVectorizer()
+x_train_counts = count_vect.fit_transform(x_train)
+print(x_train_counts.shape)
+# print(count_vect.vocabulary_.get(u'nrml')) # menghitung berapa banyak kata tertentu
+#  “Term Frequency times Inverse Document Frequency”
+tf_transform = TfidfTransformer(use_idf=False).fit(x_train_counts)
+x_train_tf = tf_transform.transform(x_train_counts)
+print(x_train_tf.shape)
+
+model = MultinomialNB().fit(x_train_tf, y_train)
+
+# Try to predict
+benar = 0
+salah = 0
+for testData in mendukung[0:]:
+    # testData = (meragukan[32])
+    test_new_counts = count_vect.transform(testData)
+    tf_transform = TfidfTransformer(use_idf=False).fit(test_new_counts)
+    test_new_tf = tf_transform.transform(test_new_counts)
+    predicted_as = model.predict(test_new_tf)
+    print(predicted_as)
+    if predicted_as=='mendukung':
+        benar+=1
+    else:
+        salah+=1
+
+for testData in meragukan[0:]:
+    # testData = (meragukan[32])
+    test_new_counts = count_vect.transform(testData)
+    tf_transform = TfidfTransformer(use_idf=False).fit(test_new_counts)
+    test_new_tf = tf_transform.transform(test_new_counts)
+    predicted_as = model.predict(test_new_tf)
+    print(predicted_as)
+    if predicted_as=='meragukan':
+        benar+=1
+    else:
+        salah+=1
+
+for testData in menolak[0:]:
+    # testData = (meragukan[32])
+    test_new_counts = count_vect.transform(testData)
+    tf_transform = TfidfTransformer(use_idf=False).fit(test_new_counts)
+    test_new_tf = tf_transform.transform(test_new_counts)
+    predicted_as = model.predict(test_new_tf)
+    print(predicted_as)
+    if predicted_as=='menolak':
+        benar+=1
+    else:
+        salah+=1
+
+print("benar = ", benar)
+print("salah = ", salah)
+print("persentase benar = ", 100*benar/(benar+salah))
 c.close()

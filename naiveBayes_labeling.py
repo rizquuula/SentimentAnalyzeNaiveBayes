@@ -49,7 +49,8 @@ def insertSentimentType(number):
     elif number == 'quit' or number == '4' or number == '' or number == ' ':
         sentiment = "break"
     else:
-        return print("Masukkan hanya nomor 1 atau 2")
+        sentiment = "break"
+        print("Masukkan hanya nomor 1 atau 2")
 
     return sentiment
 
