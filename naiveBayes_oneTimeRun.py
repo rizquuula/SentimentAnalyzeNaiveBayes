@@ -53,7 +53,7 @@ model = MultinomialNB().fit(x_train_tf, y_train)
 benar = 0
 salah = 0
 
-jumlahData = 0
+# jumlahData = 0
 
 for testData in mendukung[jumlahData:]:
     # testData = (meragukan[32])

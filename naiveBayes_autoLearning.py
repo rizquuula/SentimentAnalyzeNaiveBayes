@@ -40,13 +40,12 @@ print("Jumlah data menolak = ", numpy.array(menolak).shape) # (50, 1)
 jumlahData = 150
 print("jumlah data training = ", jumlahData)
 merged = mendukung[:jumlahData] + menolak[:jumlahData] # data training
-testDatabase = mendukung[0:] + menolak[0:] # data testing
-testDatabase = random.sample(testDatabase, len(testDatabase))
+testDatabase = mendukung[jumlahData:] + menolak[jumlahData:] # data testing
+# testDatabase = random.sample(testDatabase, len(testDatabase))
 
 x_test = []
 for x in range(len(testDatabase)):
     x_test.append(testDatabase[x][0])
-# x_test = shuffle(x_test)
 print('test database = ', numpy.array(x_test).shape)
 
 x_train = []
