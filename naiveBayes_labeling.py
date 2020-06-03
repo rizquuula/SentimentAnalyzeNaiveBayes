@@ -43,7 +43,8 @@ def insertSentimentType(number):
     if number == '1':
         sentiment = "mendukung"
     elif number == '2':
-        sentiment = "meragukan"
+        sentiment = "break"
+        print("Jadi orang kok ragu-ragu, yang tegas!!!")
     elif number == '3':
         sentiment = "menolak"
     elif number == 'quit' or number == '4' or number == '' or number == ' ':
@@ -59,7 +60,7 @@ conn = sqlite3.connect(dbPATH)  # konek ke databasenya, kalau belum ada filenya 
 c = conn.cursor()   # kursor untuk edit database
 # createIdentifiedTable()
 c.execute("""
-    SELECT primary_key FROM identifiedData WHERE type is null or type = ''
+    SELECT primary_key FROM identifiedData WHERE type is null or type = '' or type = 'meragukan'
     """)
 selected = c.fetchall()
 
