@@ -15,7 +15,7 @@ Blok diagram pada program ini ditunjukkan pada gambar berikut.
 ![Blok Diagram Program](https://github.com/stacia/SentimentAnalyzeNaiveBayes/blob/master/image/NaiveBayes_Blok%20Diagram.png)
 
 ### Perbedaan Algoritma
-Pada program ini dilakukan pengujian untuk dua algoritma yang berbeda yaitu, sekali belajar atau "One TIme Learning" dan belajar berlanjut "Continous Learning". Perbedaannya dapat dilihat pada blog diagram berikut.
+Pada program ini dilakukan pengujian untuk dua algoritma yang berbeda yaitu, sekali belajar atau "One TIme Learning" dan belajar berlanjut "continuous Learning". Perbedaannya dapat dilihat pada blog diagram berikut.
 ![Blok Diagram Perbedaan](https://github.com/stacia/SentimentAnalyzeNaiveBayes/blob/master/image/NaiveBayes_Difference.png)
 
 ## Note :
